@@ -1,0 +1,14 @@
+__pycache__/
+env/
+build/
+develop-eggs/
+dist/
+lib/
+lib64/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+venv/
+ENV/
