@@ -12,7 +12,7 @@ dependencies = [
 authors = [
   {name = "Andrew DalPino", email = "support@andrewdalpino.com"},
 ]
-description = "A specialized datastructure for counting short oligonucleotide sequences for use in Bioinformatics."
+description = "A specialized datastructure for counting short DNA sequences for use in Bioinformatics."
 readme = "README.md"
 license = {text = "MIT"}
 

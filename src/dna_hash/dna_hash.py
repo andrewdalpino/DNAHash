@@ -20,9 +20,7 @@ BASE_DECODE_MAP = {
 }
 
 class DNAHash(object):
-    counts = {
-        # 'ACTG': 0
-    }
+    counts: dict[int, int] = {}
 
     num_singletons = 0
 
@@ -102,7 +100,7 @@ class DNAHash(object):
 
     def argmax(self) -> str:
         """Return the sequence with the highest count."""
-        return max(self.counts, key=self.counts.get)
+        return self._decode(max(self.counts, key=lambda count: count))
 
     def top(self, k: int = 10) -> Iterator:
         """ Return the k sequences with the highest counts."""
@@ -110,15 +108,15 @@ class DNAHash(object):
 
         n = 0
 
-        for sequence, count in counts.items():
-            sequence = self._decode(sequence)
+        for h, count in counts.items():
+            sequence = self._decode(h)
 
             yield (sequence, count)
+
             n += 1
 
             if n >= k:
                 break
-
 
     def __getitem__(self, sequence: str) -> int:
         exists = self.filter.exists(sequence)
