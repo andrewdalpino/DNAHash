@@ -1,5 +1,6 @@
 import math
 from typing import Iterator
+import sys
 
 import numpy as np
 from nptyping import NDArray
@@ -7,6 +8,8 @@ from nptyping import NDArray
 import pybloomer
 
 UP_BIT = 1
+
+BITS_PER_BASE = 2
 
 BASE_ENCODE_MAP = {
     'A': 0,
@@ -22,18 +25,26 @@ BASE_DECODE_MAP = {
     3: 'G',
 }
 
-class DNAHash(object):
-    counts: dict[int, int] = {}
+MAX_SEQUENCE_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - 1
 
-    num_singletons = 0
+class DNAHash(object):
+    """A specialized datastructure for counting short DNA sequences for use in Bioinformatics."""
 
     @staticmethod
     def _encode(sequence: str) -> int:
         """Encode a sequence using the up2bit representation."""
+        m = len(sequence)
+
+        if m > MAX_SEQUENCE_LENGTH:
+            raise ValueError(f'Sequence length must be less than {MAX_SEQUENCE_LENGTH}, {m} given.')
+
         hash = UP_BIT
 
-        for i in range(len(sequence) - 1, -1, -1):
+        for i in range(m - 1, -1, -1):
             base = sequence[i]
+
+            if base not in BASE_ENCODE_MAP:
+                raise ValueError(f'Invalid base, {base} given.')
 
             hash <<= 2
 
@@ -64,10 +75,8 @@ class DNAHash(object):
             layer_size=layer_size,
         )
 
-    @property
-    def num_non_singletons(self) -> int:
-        """Return the total number of non-singleton sequences counted so far."""
-        return sum(self.counts.values())
+        self.counts: dict[int, int] = {}
+        self.num_singletons = 0
 
     @property
     def num_sequences(self) -> int:
@@ -78,6 +87,11 @@ class DNAHash(object):
     def num_unique_sequences(self) -> int:
         """Return the number of unique sequences stored in the hash table."""
         return len(self.counts) + self.num_singletons
+
+    @property
+    def num_non_singletons(self) -> int:
+        """Return the total number of non-singleton sequences counted so far."""
+        return sum(self.counts.values())
 
     def increment(self, sequence: str) -> None:
         """Increment the count for a given sequence by 1."""
@@ -99,27 +113,24 @@ class DNAHash(object):
 
     def max(self) -> int:
         """Return the highest sequence count."""
-        return max(self.counts)
+        return max(self.counts.values())
 
     def argmax(self) -> str:
         """Return the sequence with the highest count."""
-        return self._decode(max(self.counts, key=lambda count: count))
+        hash, count = max(self.counts.items(), key=lambda count: count[1])
+
+        return self._decode(hash)
 
     def top(self, k: int = 10) -> Iterator:
         """ Return the k sequences with the highest counts."""
-        counts = dict(sorted(self.counts.items(), key=lambda count: count[1], reverse=True))
+        counts = sorted(self.counts.items(), key=lambda count: count[1], reverse=True)
 
-        n = 0
+        counts = counts[0:k]
 
-        for h, count in counts.items():
-            sequence = self._decode(h)
+        for hash, count in counts:
+            sequence = self._decode(hash)
 
             yield (sequence, count)
-
-            n += 1
-
-            if n >= k:
-                break
 
     def histogram(self, bins: int = 10) -> NDArray:
         """Return a histogram of sequences bucketed by their counts."""

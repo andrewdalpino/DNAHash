@@ -1,6 +1,6 @@
 # DNA Hash
 
-A Python library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that exploits the fact that each base need only 2 bits to encode. Accordingly, DNA Hash uses considerably less memory than a lookup table that stores raw gene sequences. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
+A Python library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
 
 - **Ultra-low** memory footprint
 - **Embarrassingly** parallelizable
