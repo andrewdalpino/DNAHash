@@ -32,11 +32,12 @@ class DNAHash(object):
 
     @staticmethod
     def _encode(sequence: str) -> int:
-        """Encode a sequence using the up2bit representation."""
+        """Encode a variable-length sequence using the up2bit representation."""
         m = len(sequence)
 
         if m > MAX_SEQUENCE_LENGTH:
-            raise ValueError(f'Sequence length must be less than {MAX_SEQUENCE_LENGTH}, {m} given.')
+            raise ValueError('Sequence length must be less than'
+                + f' {MAX_SEQUENCE_LENGTH}, {sequence} given.')
 
         hash = UP_BIT
 
@@ -54,7 +55,7 @@ class DNAHash(object):
 
     @staticmethod
     def _decode(hash: int) -> str:
-        """Decode an up2bit hash into a sequence."""
+        """Decode an up2bit hash into a variable-length sequence."""
         sequence = ''
 
         for i in range(0, int(math.log(hash, 2)), 2):
@@ -170,3 +171,4 @@ class DNAHash(object):
         
     def __len__(self) -> int:
         return self.num_sequences
+        
