@@ -7,61 +7,61 @@ from nptyping import NDArray
 
 import pybloomer
 
-UP_BIT = 1
-
-BITS_PER_BASE = 2
-
-BASE_ENCODE_MAP = {
-    'A': 0,
-    'C': 1,
-    'T': 2,
-    'G': 3,
-}
-
-BASE_DECODE_MAP = {
-    0: 'A',
-    1: 'C',
-    2: 'T',
-    3: 'G',
-}
-
-MAX_SEQUENCE_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - 1
-
 class DNAHash(object):
     """A specialized datastructure for counting short DNA sequences for use in Bioinformatics."""
 
-    @staticmethod
-    def _encode(sequence: str) -> int:
+    UP_BIT = 1
+
+    BITS_PER_BASE = 2
+
+    BASE_ENCODE_MAP = {
+        'A': 0,
+        'C': 1,
+        'T': 2,
+        'G': 3,
+    }
+
+    BASE_DECODE_MAP = {
+        0: 'A',
+        1: 'C',
+        2: 'T',
+        3: 'G',
+    }
+
+    MAX_SEQUENCE_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - 1
+
+    @classmethod
+    def _encode(cls, sequence: str) -> int:
         """Encode a variable-length sequence using the up2bit representation."""
         m = len(sequence)
 
-        if m > MAX_SEQUENCE_LENGTH:
+        if m > cls.MAX_SEQUENCE_LENGTH:
             raise ValueError('Sequence length must be less than'
-                + f' {MAX_SEQUENCE_LENGTH}, {sequence} given.')
+                + f' {cls.MAX_SEQUENCE_LENGTH}, {sequence} given.')
 
-        hash = UP_BIT
+        hash = cls.UP_BIT
 
         for i in range(m - 1, -1, -1):
             base = sequence[i]
 
-            if base not in BASE_ENCODE_MAP:
+            if base not in cls.BASE_ENCODE_MAP:
                 raise ValueError(f'Invalid base, {base} given.')
 
             hash <<= 2
 
-            hash += BASE_ENCODE_MAP[base]
+            hash += cls.BASE_ENCODE_MAP[base]
 
         return hash
 
-    @staticmethod
-    def _decode(hash: int) -> str:
+    @classmethod
+    def _decode(cls, hash: int) -> str:
         """Decode an up2bit hash into a variable-length sequence."""
         sequence = ''
 
         for i in range(0, int(math.log(hash, 2)), 2):
             base = (hash >> i) & 3
 
-            sequence += BASE_DECODE_MAP[base]
+            sequence += cls.BASE_DECODE_MAP[base]
 
         return sequence
 
