@@ -1,6 +1,9 @@
 import math
 from typing import Iterator
 
+import numpy as np
+from nptyping import NDArray
+
 import pybloomer
 
 UP_BIT = 1
@@ -117,6 +120,12 @@ class DNAHash(object):
 
             if n >= k:
                 break
+
+    def histogram(self, bins: int = 10) -> NDArray:
+        """Return a histogram of sequences bucketed by their counts."""
+        histogram, edges = np.histogram(list(self.counts.values()), bins=bins)
+
+        return histogram
 
     def __getitem__(self, sequence: str) -> int:
         exists = self.filter.exists(sequence)

@@ -23,10 +23,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install dependencies
-        run: pip install .
-
-      - name: Install Mypy
-        run: pip install mypy
+        run: pip install -e '.[test]'
 
       - name: Static analysis
         run: mypy ./src
