@@ -5,8 +5,10 @@ from typing import Generator
 INVALID_BASE_REGEX = r'[^ACTG]'
 
 class Tokenizer(ABC):
+    """Base tokenizer class"""
+
     @abstractmethod
-    def tokenize(self, sequence: str):
+    def tokenize(self, sequence: str) -> Generator[str, None, None]:
         pass
 
 class Kmer(Tokenizer):
@@ -22,7 +24,9 @@ class Kmer(Tokenizer):
 
     def tokenize(self, sequence: str) -> Generator[str, None, None]:
         """Tokenize the sequence."""
-        for i in range(0, len(sequence) - self.k):
+        i = 0
+
+        while i < len(sequence) - self.k:
             token = sequence[i:i + self.k]
 
             invalid_token = self.invalid_base.search(token)
@@ -37,6 +41,8 @@ class Kmer(Tokenizer):
                 continue
 
             yield token
+
+            i += 1
 
 class Canonical(Tokenizer):
     """Tokenize sequences in their canonical form."""
