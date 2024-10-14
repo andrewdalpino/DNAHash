@@ -8,7 +8,7 @@ A Python library for counting short DNA sequences for use in Bioinformatics. DNA
 
 > **Note:** The maximum sequence length is platform dependent. On a 64-bit machine, the max length is 31. On a 32-bit machine, the max length is 15.
 
-> **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences at a bounded rate.
+> **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences but at a bounded user-defined rate.
 
 ## References
 - [1] https://github.com/JohnLonginotto/ACGTrie/blob/master/docs/UP2BIT.md.

@@ -1,5 +1,5 @@
 __pycache__/
-.mypy-cache/
+.mypy_cache/
 env/
 build/
 develop-eggs/

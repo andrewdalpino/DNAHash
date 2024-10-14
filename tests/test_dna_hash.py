@@ -7,7 +7,7 @@ BASES = ['A', 'C', 'T', 'G']
 
 class TestDNAHash(unittest.TestCase):
     @staticmethod
-    def _random_read(k: int) -> str:
+    def random_read(k: int) -> str:
         return ''.join(BASES[random.randint(0, 3)] for i in range(0, k))
 
     def test_basic(self):
@@ -57,7 +57,7 @@ class TestDNAHash(unittest.TestCase):
         hash_table = dna_hash.DNAHash()
 
         for i in range(0, 100000):
-            hash_table.increment(self._random_read(8))
+            hash_table.increment(self.random_read(8))
 
         self.assertEqual(hash_table.num_sequences, 100000)
         self.assertEqual(hash_table.num_singletons, 21780)

@@ -45,7 +45,7 @@ class DNAHash(object):
             base = sequence[i]
 
             if base not in cls.BASE_ENCODE_MAP:
-                raise ValueError(f'Invalid base, {base} given.')
+                raise ValueError(f'Invalid base {base} given in sequence {sequence}.')
 
             hash <<= 2
 
