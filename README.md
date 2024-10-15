@@ -12,7 +12,7 @@ A datastructure and tokenization library for counting short DNA sequences for us
 > **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences at a bounded rate.
 
 ## Installation
-Install DNA Hash using a Python package manager, example pip:
+Install DNA Hash using a Python [package manager](https://packaging.python.org/en/latest/tutorials/installing-packages/), example pip:
 
 ```
 pip install dnahash
