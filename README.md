@@ -10,6 +10,39 @@ A Python library for counting short DNA sequences for use in Bioinformatics. DNA
 
 > **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences but at a bounded user-defined rate.
 
+**Example**
+
+```python
+from dna_hash import DNAHash, tokenizers
+
+from Bio import SeqIO
+from matplotlib import pyplot as plt
+
+hash_table = DNAHash(max_false_positive_rate=0.001)
+
+tokenizer = tokenizers.Canonical(tokenizers.Kmer(6))
+
+with open('covid-19-virus.fasta', 'r') as file:
+    for record in SeqIO.parse(file, 'fasta'):
+        for token in tokenizer.tokenize(str(record.seq)):
+            hash_table.increment(token)
+
+for sequence, count in hash_table.top(25):
+    print(f'{sequence}: {count}')
+
+print(f'Total sequences: {hash_table.num_sequences}')
+print(f'# of unique sequences: {hash_table.num_unique_sequences}')
+print(f'# of singletons: {hash_table.num_singletons}')
+
+counts, bins = hash_table.histogram(20)
+
+plt.stairs(counts, bins)
+plt.title('Histogram of SARS-CoV-2 Genome')
+plt.xlabel('Counts')
+plt.ylabel('Frequency')
+plt.show()
+```
+
 ## References
 - [1] https://github.com/JohnLonginotto/ACGTrie/blob/master/docs/UP2BIT.md.
 - [2] P. Melsted et al. (2011). Efficient counting of k-mers in DNA sequences using a bloom filter.
