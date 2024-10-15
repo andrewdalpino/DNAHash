@@ -1,6 +1,6 @@
 # DNA Hash
 
-A Python library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
+A datastructure and tokenization library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
 
 - **Ultra-low** memory footprint
 - **Embarrassingly** parallelizable
@@ -8,7 +8,7 @@ A Python library for counting short DNA sequences for use in Bioinformatics. DNA
 
 > **Note:** The maximum sequence length is platform dependent. On a 64-bit machine, the max length is 31. On a 32-bit machine, the max length is 15.
 
-> **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences but at a bounded user-defined rate.
+> **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences at a bounded rate.
 
 ## Installation
 Install DNA Hash using a Python package manager, example pip:
@@ -16,6 +16,13 @@ Install DNA Hash using a Python package manager, example pip:
 ```
 pip install dnahash
 ```
+
+## Parameters
+| # | Name | Default | Type | Description |
+|---|---|---|---|---|
+| 1 | max_false_positive_rate | 0.01 | float | The upper bound on the false positivity rate. |
+| 2 | num_hashes | 4 | int | The number of hash functions used, i.e. the number of slices per layer. |
+| 3 | layer_size | 32000000 | int | The size of each layer of the Bloom filter in bits. |
 
 ## Example Usage
 
