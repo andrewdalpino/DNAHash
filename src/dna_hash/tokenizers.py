@@ -69,7 +69,7 @@ class Canonical(Tokenizer):
 
         return complement
 
-    def __init__(self, base) -> None:
+    def __init__(self, base: Tokenizer) -> None:
         self.base = base
 
     def tokenize(self, sequence: str) -> Generator[str, None, None]:

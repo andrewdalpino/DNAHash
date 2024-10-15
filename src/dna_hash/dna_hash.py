@@ -94,6 +94,24 @@ class DNAHash(object):
         """Return the total number of non-singleton sequences counted so far."""
         return sum(self.counts.values())
 
+    def insert(self, sequence: str, count: int = 1) -> None:
+        """Insert a sequence count into the hash table."""
+        if count < 1:
+            raise ValueError(f'Count cannot be less than 1, {count} given.')
+
+        exists = self.filter.exists_or_insert(sequence)
+
+        if count > 1:
+            hash = self._encode(sequence)
+
+            if exists and hash not in self.counts:
+                self.num_singletons -= 1
+
+            self.counts[hash] = count
+        
+        elif not exists:
+            self.num_singletons += 1
+
     def increment(self, sequence: str) -> None:
         """Increment the count for a given sequence by 1."""
         exists = self.filter.exists_or_insert(sequence)
@@ -118,28 +136,12 @@ class DNAHash(object):
 
     def argmax(self) -> str:
         """Return the sequence with the highest count."""
-        hash, count = max(self.counts.items(), key=lambda count: count[1])
+        hash, count = max(self.counts.items(), key=lambda item: item[1])
 
         return self._decode(hash)
 
-    def top(self, k: int = 10) -> Iterator:
-        """ Return the k sequences with the highest counts."""
-        counts = sorted(self.counts.items(), key=lambda count: count[1], reverse=True)
-
-        counts = counts[0:k]
-
-        for hash, count in counts:
-            sequence = self._decode(hash)
-
-            yield (sequence, count)
-
-    def histogram(self, bins: int = 10) -> NDArray:
-        """Return a histogram of sequences bucketed by their counts."""
-        histogram, edges = np.histogram(list(self.counts.values()), bins=bins)
-
-        return histogram
-
-    def __getitem__(self, sequence: str) -> int:
+    def get(self, sequence: str) ->int:
+        """Return the count for a sequence."""
         exists = self.filter.exists(sequence)
         
         if not exists:
@@ -152,22 +154,26 @@ class DNAHash(object):
 
         return 1
 
+    def top(self, k: int = 10) -> Iterator:
+        """ Return the k sequences with the highest counts."""
+        counts = sorted(self.counts.items(), key=lambda item: item[1], reverse=True)
+
+        for hash, count in counts[0:k]:
+            sequence = self._decode(hash)
+
+            yield (sequence, count)
+
+    def histogram(self, bins: int = 10) -> NDArray:
+        """Return a histogram of sequences bucketed by their counts."""
+        histogram, edges = np.histogram(list(self.counts.values()), bins=bins)
+
+        return histogram
+
     def __setitem__(self, sequence: str, count: int) -> None:
-        if count < 1:
-            raise ValueError(f'Count cannot be less than 1, {count} given.')
+        self.insert(sequence, count)
 
-        exists = self.filter.exists_or_insert(sequence)
-
-        if count > 1:
-            hash = self._encode(sequence)
-
-            if exists and hash not in self.counts:
-                self.num_singletons -= 1
-
-            self.counts[hash] = count
-        
-        elif not exists:
-            self.num_singletons += 1
+    def __getitem__(self, sequence: str) -> int:
+        return self.get(sequence)
         
     def __len__(self) -> int:
         return self.num_sequences
