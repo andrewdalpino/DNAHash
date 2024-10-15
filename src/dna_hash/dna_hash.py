@@ -13,8 +13,6 @@ class DNAHash(object):
 
     UP_BIT = 1
 
-    BITS_PER_BASE = 2
-
     BASE_ENCODE_MAP = {
         'A': 0,
         'C': 1,
@@ -22,14 +20,11 @@ class DNAHash(object):
         'G': 3,
     }
 
-    BASE_DECODE_MAP = {
-        0: 'A',
-        1: 'C',
-        2: 'T',
-        3: 'G',
-    }
+    BITS_PER_BASE = max(BASE_ENCODE_MAP.values()).bit_length()
 
-    MAX_SEQUENCE_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - 1
+    MAX_SEQUENCE_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - UP_BIT.bit_length()
+
+    BASE_DECODE_MAP = {encoding: base for base, encoding in BASE_ENCODE_MAP.items()}
 
     @classmethod
     def _encode(cls, sequence: str) -> int:
