@@ -13,6 +13,8 @@ class TestKmer(unittest.TestCase):
         for i, token in enumerate(tokens):
             self.assertEqual(token, expected[i])
 
+        self.assertEqual(tokenizer.dropped, 6)
+
 class TestCanonical(unittest.TestCase):
     def test_tokenize(self):
         tokenizer = tokenizers.Canonical(tokenizers.Kmer(k=6))
@@ -34,3 +36,6 @@ class TestFragment(unittest.TestCase):
 
         for i, token in enumerate(tokens):
             self.assertEqual(token, expected[i])
+
+        self.assertEqual(tokenizer.dropped, 1)
+        
