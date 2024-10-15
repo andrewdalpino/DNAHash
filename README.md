@@ -63,6 +63,8 @@ Total sequences: 29876
 # of singletons: 100
 ```
 
+![SARS-CoV-2 Histogram](https://raw.githubusercontent.com/andrewdalpino/DNAHash/refs/heads/master/docs/images/sars-cov-2-histogram.png)
+
 ## References
 - [1] https://github.com/JohnLonginotto/ACGTrie/blob/master/docs/UP2BIT.md.
 - [2] P. Melsted et al. (2011). Efficient counting of k-mers in DNA sequences using a bloom filter.
