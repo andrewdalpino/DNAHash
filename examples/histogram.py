@@ -1,8 +1,7 @@
 from dna_hash import DNAHash, tokenizers
 
 from Bio import SeqIO
-
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 hash_table = DNAHash(max_false_positive_rate=0.001)
 
