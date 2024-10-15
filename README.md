@@ -10,7 +10,14 @@ A Python library for counting short DNA sequences for use in Bioinformatics. DNA
 
 > **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences but at a bounded user-defined rate.
 
-**Example**
+## Installation
+Install DNA Hash using a Python package manager, example pip:
+
+```
+pip install dnahash
+```
+
+## Example Usage
 
 ```python
 from dna_hash import DNAHash, tokenizers

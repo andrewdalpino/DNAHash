@@ -1,11 +1,12 @@
 import math
-from typing import Iterator, Tuple
 import sys
 
 import numpy as np
-from nptyping import NDArray
 
-import pybloomer
+from nptyping import NDArray
+from typing import Iterator, Tuple
+
+import okbloomer
 
 class DNAHash(object):
     """A specialized datastructure for counting short DNA sequences for use in Bioinformatics."""
@@ -70,7 +71,7 @@ class DNAHash(object):
                 num_hashes: int = 4,
                 layer_size: int = 32000000) -> None:
 
-        self.filter = pybloomer.BloomFilter(
+        self.filter = okbloomer.BloomFilter(
             max_false_positive_rate=max_false_positive_rate,
             num_hashes=num_hashes,
             layer_size=layer_size,
