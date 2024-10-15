@@ -2,6 +2,7 @@
 
 A datastructure and tokenization library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
 
+- **Variable** sequence lengths
 - **Ultra-low** memory footprint
 - **Embarrassingly** parallelizable
 - **Open-source** and free to use commercially
@@ -16,13 +17,6 @@ Install DNA Hash using a Python package manager, example pip:
 ```
 pip install dnahash
 ```
-
-## Parameters
-| # | Name | Default | Type | Description |
-|---|---|---|---|---|
-| 1 | max_false_positive_rate | 0.01 | float | The upper bound on the false positivity rate. |
-| 2 | num_hashes | 4 | int | The number of hash functions used, i.e. the number of slices per layer. |
-| 3 | layer_size | 32000000 | int | The size of each layer of the Bloom filter in bits. |
 
 ## Example Usage
 
@@ -55,6 +49,18 @@ plt.title('Histogram of SARS-CoV-2 Genome')
 plt.xlabel('Counts')
 plt.ylabel('Frequency')
 plt.show()
+```
+
+```
+TAACAA: 70
+TTAAAA: 68
+ACAACA: 65
+...
+CATTAA: 49
+
+Total sequences: 29876
+# of unique sequences: 2013
+# of singletons: 100
 ```
 
 ## References

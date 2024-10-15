@@ -55,9 +55,9 @@ class DNAHash(object):
         sequence = ''
 
         for i in range(0, int(math.log(hash, 2)), 2):
-            base = (hash >> i) & 3
+            encoding = (hash >> i) & 3
 
-            sequence += cls.BASE_DECODE_MAP[base]
+            sequence += cls.BASE_DECODE_MAP[encoding]
 
         return sequence
 
