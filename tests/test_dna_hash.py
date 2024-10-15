@@ -3,14 +3,14 @@ import random
 
 import dna_hash
 
-BASES = ['A', 'C', 'T', 'G']
-
 class TestDNAHash(unittest.TestCase):
-    @staticmethod
-    def random_read(k: int) -> str:
-        return ''.join(BASES[random.randint(0, 3)] for i in range(0, k))
+    BASES = ['A', 'C', 'T', 'G']
 
-    def test_basic(self):
+    @classmethod
+    def random_read(cls, k: int) -> str:
+        return ''.join(cls.BASES[random.randint(0, 3)] for i in range(0, k))
+
+    def test_increment(self):
         hash_table = dna_hash.DNAHash()
 
         self.assertEqual(hash_table.num_singletons, 0)

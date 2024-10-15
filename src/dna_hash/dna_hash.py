@@ -1,5 +1,5 @@
 import math
-from typing import Iterator
+from typing import Iterator, Tuple
 import sys
 
 import numpy as np
@@ -163,11 +163,9 @@ class DNAHash(object):
 
             yield (sequence, count)
 
-    def histogram(self, bins: int = 10) -> NDArray:
+    def histogram(self, bins: int = 10) -> Tuple[NDArray, NDArray]:
         """Return a histogram of sequences bucketed by their counts."""
-        histogram, edges = np.histogram(list(self.counts.values()), bins=bins)
-
-        return histogram
+        return np.histogram(list(self.counts.values()), bins=bins)
 
     def __setitem__(self, sequence: str, count: int) -> None:
         self.insert(sequence, count)
