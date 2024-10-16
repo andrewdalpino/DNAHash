@@ -1,9 +1,10 @@
-import unittest
 import random
+
+from unittest import TestCase
 
 from dna_hash import DNAHash
 
-class TestDNAHash(unittest.TestCase):
+class TestDNAHash(TestCase):
     BASES = ['A', 'C', 'T', 'G']
 
     @classmethod
