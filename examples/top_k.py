@@ -1,10 +1,11 @@
-from dna_hash import DNAHash, tokenizers
+from dna_hash import DNAHash
+from dna_hash.tokenizers import Kmer, Canonical
 
 from Bio import SeqIO
 
 hash_table = DNAHash(max_false_positive_rate=0.001)
 
-tokenizer = tokenizers.Canonical(tokenizers.Kmer(6))
+tokenizer = Canonical(Kmer(6))
 
 with open('covid-19-virus.fasta', 'r') as file:
     for record in SeqIO.parse(file, 'fasta'):

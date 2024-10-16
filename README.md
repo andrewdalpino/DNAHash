@@ -1,6 +1,6 @@
 # DNA Hash
 
-A datastructure and tokenization library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
+A specialized datastructure and tokenization library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
 
 - **Variable** sequence lengths
 - **Ultra-low** memory footprint
@@ -21,14 +21,15 @@ pip install dnahash
 ## Example Usage
 
 ```python
-from dna_hash import DNAHash, tokenizers
+from dna_hash import DNAHash
+from dna_hash.tokenizers import Kmer, Canonical
 
 from Bio import SeqIO
 from matplotlib import pyplot as plt
 
 hash_table = DNAHash(max_false_positive_rate=0.001)
 
-tokenizer = tokenizers.Canonical(tokenizers.Kmer(6))
+tokenizer = Canonical(Kmer(6))
 
 with open('covid-19-virus.fasta', 'r') as file:
     for record in SeqIO.parse(file, 'fasta'):

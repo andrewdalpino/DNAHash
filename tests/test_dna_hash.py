@@ -1,7 +1,7 @@
 import unittest
 import random
 
-import dna_hash
+from dna_hash import DNAHash
 
 class TestDNAHash(unittest.TestCase):
     BASES = ['A', 'C', 'T', 'G']
@@ -11,7 +11,7 @@ class TestDNAHash(unittest.TestCase):
         return ''.join(cls.BASES[random.randint(0, 3)] for i in range(0, k))
 
     def test_increment(self):
-        hash_table = dna_hash.DNAHash()
+        hash_table = DNAHash()
 
         self.assertEqual(hash_table.num_singletons, 0)
         self.assertEqual(hash_table.num_sequences, 0)
@@ -35,7 +35,7 @@ class TestDNAHash(unittest.TestCase):
         self.assertEqual(hash_table.argmax(), 'ACTG')
 
     def test_top_k(self):
-        hash_table = dna_hash.DNAHash()
+        hash_table = DNAHash()
 
         hash_table['CTGA'] = 1
         hash_table['ACTG'] = 10
@@ -54,7 +54,7 @@ class TestDNAHash(unittest.TestCase):
     def test_advanced(self):
         random.seed(1)
 
-        hash_table = dna_hash.DNAHash()
+        hash_table = DNAHash()
 
         for i in range(0, 100000):
             hash_table.increment(self.random_read(8))

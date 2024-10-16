@@ -1,10 +1,10 @@
 import unittest
 
-from dna_hash import tokenizers
+from dna_hash.tokenizers import Kmer, Canonical, Fragment
 
 class TestKmer(unittest.TestCase):
     def test_tokenize(self):
-        tokenizer = tokenizers.Kmer(k=6)
+        tokenizer = Kmer(k=6)
 
         tokens = tokenizer.tokenize('CGGTTCAGCANG')
 
@@ -17,7 +17,7 @@ class TestKmer(unittest.TestCase):
 
 class TestCanonical(unittest.TestCase):
     def test_tokenize(self):
-        tokenizer = tokenizers.Canonical(tokenizers.Kmer(k=6))
+        tokenizer = Canonical(Kmer(k=6))
 
         tokens = tokenizer.tokenize('CGGTTCAGCANG')
 
@@ -28,7 +28,7 @@ class TestCanonical(unittest.TestCase):
 
 class TestFragment(unittest.TestCase):
     def test_tokenize(self):
-        tokenizer = tokenizers.Fragment(n=4)
+        tokenizer = Fragment(n=4)
 
         tokens = tokenizer.tokenize('CGGTTCAGCANGTAAT')
 
