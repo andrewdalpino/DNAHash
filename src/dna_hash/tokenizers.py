@@ -15,11 +15,12 @@ class Tokenizer(ABC):
 class Kmer(Tokenizer):
     """Generates tokens of length k from reads."""
 
-    def __init__(self, k: int) -> None:
+    def __init__(self, k: int, skip_invalid: bool = False) -> None:
         if k < 1:
             raise ValueError(f'K cannot be less than 1, {k} given.')
 
         self.k = k
+        self.skip_invalid = skip_invalid
         self.invalid_base = re.compile(INVALID_BASE_REGEX)
         self.dropped = 0
 
@@ -33,17 +34,24 @@ class Kmer(Tokenizer):
             invalid_token = self.invalid_base.search(token)
 
             if invalid_token:
-                skip = 1 + invalid_token.start()
+                if not self.skip_invalid:
+                    offset = i + invalid_token.start()
+                
+                    raise ValueError('Invalid base detected at'
+                        + f' offset {offset} in sequence.')
 
-                i += skip
+                else:
+                    skip = 1 + invalid_token.start()
 
-                self.dropped += skip
+                    i += skip
 
-                continue
+                    self.dropped += skip
 
-            yield token
+                    continue
 
             i += 1
+            
+            yield token
 
 class Canonical(Tokenizer):
     """Tokenize sequences in their canonical form."""
@@ -83,24 +91,39 @@ class Canonical(Tokenizer):
 class Fragment(Tokenizer):
     """Generates a non-overlapping fragment of length n from a sequence."""
 
-    def __init__(self, n: int) -> None:
+    def __init__(self, n: int, skip_invalid: bool = False) -> None:
         if n < 1:
             raise ValueError(f'N must be greater than 1, {n} given.')
 
         self.n = n
+        self.skip_invalid = skip_invalid
         self.invalid_base = re.compile(INVALID_BASE_REGEX)
         self.dropped = 0
 
     def tokenize(self, sequence: str) -> Generator[str, None, None]:
-         """Tokenize the sequence."""
-         for i in range(0, len(sequence) - self.n, self.n):
+        """Tokenize the sequence."""
+        m = len(sequence)
+
+        if m < self.n:
+            yield sequence
+
+            return
+
+        for i in range(0, m, self.n):
             token = sequence[i:i + self.n]
 
             invalid_token = self.invalid_base.search(token)
 
             if invalid_token:
-                self.dropped += 1
+                if not self.skip_invalid:
+                    offset = i + invalid_token.start()
+                
+                    raise ValueError('Invalid base detected at'
+                        + f' offset {offset} in sequence.')
 
-                continue
+                else:
+                    self.dropped += 1
+
+                    continue
 
             yield token

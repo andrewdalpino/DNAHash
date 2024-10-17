@@ -13,10 +13,15 @@ with open('covid-19-virus.fasta', 'r') as file:
         for token in tokenizer.tokenize(str(record.seq)):
             hash_table.increment(token)
 
-counts, bins = hash_table.histogram(20)
+for sequence, count in hash_table.top(25):
+    print(f'{sequence}: {count}')
 
-plt.stairs(counts, bins)
-plt.title('Histogram of SARS-CoV-2 Genome')
+print(f'Total sequences: {hash_table.num_sequences}')
+print(f'# of unique sequences: {hash_table.num_unique_sequences}')
+print(f'# of singletons: {hash_table.num_singletons}')
+
+plt.hist(list(hash_table.counts.values()), bins=20)
+plt.title('SARS-CoV-2 Genome')
 plt.xlabel('Counts')
 plt.ylabel('Frequency')
 plt.show()

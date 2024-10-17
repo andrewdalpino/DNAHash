@@ -4,7 +4,7 @@ from dna_hash.tokenizers import Kmer, Canonical, Fragment
 
 class TestKmer(TestCase):
     def test_tokenize(self):
-        tokenizer = Kmer(k=6)
+        tokenizer = Kmer(k=6, skip_invalid=True)
 
         tokens = tokenizer.tokenize('CGGTTCAGCANG')
 
@@ -17,7 +17,7 @@ class TestKmer(TestCase):
 
 class TestCanonical(TestCase):
     def test_tokenize(self):
-        tokenizer = Canonical(Kmer(k=6))
+        tokenizer = Canonical(Kmer(k=6, skip_invalid=True))
 
         tokens = tokenizer.tokenize('CGGTTCAGCANG')
 
@@ -28,7 +28,7 @@ class TestCanonical(TestCase):
 
 class TestFragment(TestCase):
     def test_tokenize(self):
-        tokenizer = Fragment(n=4)
+        tokenizer = Fragment(n=4, skip_invalid=True)
 
         tokens = tokenizer.tokenize('CGGTTCAGCANGTAAT')
 

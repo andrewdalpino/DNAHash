@@ -1,15 +1,14 @@
 import math
 import sys
 
-import numpy as np
-
-from nptyping import NDArray
 from typing import Iterator, Tuple
 
 import okbloomer
 
+from dna_hash.tokenizers import Fragment
+
 class DNAHash(object):
-    """A specialized datastructure for counting short DNA sequences for use in Bioinformatics."""
+    """A specialized datastructure for counting DNA sequences for use in Bioinformatics."""
 
     UP_BIT = 1
 
@@ -22,44 +21,9 @@ class DNAHash(object):
 
     BITS_PER_BASE = max(BASE_ENCODE_MAP.values()).bit_length()
 
-    MAX_SEQUENCE_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - UP_BIT.bit_length()
+    MAX_FRAGMENT_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - UP_BIT.bit_length()
 
     BASE_DECODE_MAP = {encoding: base for base, encoding in BASE_ENCODE_MAP.items()}
-
-    @classmethod
-    def _encode(cls, sequence: str) -> int:
-        """Encode a variable-length sequence using the up2bit representation."""
-        m = len(sequence)
-
-        if m > cls.MAX_SEQUENCE_LENGTH:
-            raise ValueError('Sequence length must be less than'
-                + f' {cls.MAX_SEQUENCE_LENGTH}, {sequence} given.')
-
-        hash = cls.UP_BIT
-
-        for i in range(m - 1, -1, -1):
-            base = sequence[i]
-
-            if base not in cls.BASE_ENCODE_MAP:
-                raise ValueError(f'Invalid base {base} given in sequence {sequence}.')
-
-            hash <<= 2
-
-            hash += cls.BASE_ENCODE_MAP[base]
-
-        return hash
-
-    @classmethod
-    def _decode(cls, hash: int) -> str:
-        """Decode an up2bit hash into a variable-length sequence."""
-        sequence = ''
-
-        for i in range(0, int(math.log(hash, 2)), 2):
-            encoding = (hash >> i) & 3
-
-            sequence += cls.BASE_DECODE_MAP[encoding]
-
-        return sequence
 
     def __init__(self,
                 max_false_positive_rate: float = 0.01,
@@ -72,8 +36,9 @@ class DNAHash(object):
             layer_size=layer_size,
         )
 
-        self.counts: dict[int, int] = {}
+        self.counts: dict[Tuple[int, ...], int] = {}
         self.num_singletons = 0
+        self.tokenizer = Fragment(self.MAX_FRAGMENT_LENGTH)
 
     @property
     def num_sequences(self) -> int:
@@ -90,7 +55,7 @@ class DNAHash(object):
         """Return the total number of non-singleton sequences counted so far."""
         return sum(self.counts.values())
 
-    def insert(self, sequence: str, count: int = 1) -> None:
+    def insert(self, sequence: str, count: int) -> None:
         """Insert a sequence count into the hash table."""
         if count < 1:
             raise ValueError(f'Count cannot be less than 1, {count} given.')
@@ -98,12 +63,12 @@ class DNAHash(object):
         exists = self.filter.exists_or_insert(sequence)
 
         if count > 1:
-            hash = self._encode(sequence)
+            hashes = self._encode(sequence)
 
-            if exists and hash not in self.counts:
+            if exists and hashes not in self.counts:
                 self.num_singletons -= 1
 
-            self.counts[hash] = count
+            self.counts[hashes] = count
         
         elif not exists:
             self.num_singletons += 1
@@ -113,15 +78,15 @@ class DNAHash(object):
         exists = self.filter.exists_or_insert(sequence)
 
         if exists:
-            hash = self._encode(sequence)
+            hashes = self._encode(sequence)
 
-            if hash in self.counts:
-                self.counts[hash] += 1
+            if hashes in self.counts:
+                self.counts[hashes] += 1
             
             else:
                 self.num_singletons -= 1
 
-                self.counts[hash] = 2
+                self.counts[hashes] = 2
 
         else:
             self.num_singletons += 1
@@ -132,9 +97,9 @@ class DNAHash(object):
 
     def argmax(self) -> str:
         """Return the sequence with the highest count."""
-        hash, count = max(self.counts.items(), key=lambda item: item[1])
+        hashes, count = max(self.counts.items(), key=lambda item: item[1])
 
-        return self._decode(hash)
+        return self._decode(hashes)
 
     def get(self, sequence: str) ->int:
         """Return the count for a sequence."""
@@ -143,10 +108,10 @@ class DNAHash(object):
         if not exists:
             raise ValueError('Sequence not found in hash table.')
 
-        hash = self._encode(sequence)
+        hashes = self._encode(sequence)
 
-        if hash in self.counts:
-            return self.counts[hash]
+        if hashes in self.counts:
+            return self.counts[hashes]
 
         return 1
 
@@ -154,14 +119,44 @@ class DNAHash(object):
         """ Return the k sequences with the highest counts."""
         counts = sorted(self.counts.items(), key=lambda item: item[1], reverse=True)
 
-        for hash, count in counts[0:k]:
-            sequence = self._decode(hash)
+        for hashes, count in counts[0:k]:
+            sequence = self._decode(hashes)
 
             yield (sequence, count)
 
-    def histogram(self, bins: int = 10) -> Tuple[NDArray, NDArray]:
-        """Return a histogram of sequences bucketed by their counts."""
-        return np.histogram(list(self.counts.values()), bins=bins)
+    def _encode(self, sequence: str) -> Tuple[int, ...]:
+        """Encode a variable-length sequence using the up2bit representation."""
+        hashes = []
+
+        for fragment in self.tokenizer.tokenize(sequence):
+            n = len(fragment)
+
+            hash = self.UP_BIT
+
+            for i in range(n - 1, -1, -1):
+                base = fragment[i]
+
+                hash <<= 2
+                hash += self.BASE_ENCODE_MAP[base]
+
+            hashes.append(hash)
+
+        return tuple(hashes)
+
+    def _decode(self, hashes: Tuple[int, ...]) -> str:
+        """Decode an up2bit representation into a variable-length sequence."""
+        sequence = ''
+        
+        for hash in hashes:
+            if hash == self.UP_BIT:
+                continue
+
+            for i in range(0, int(math.log(hash, 2)), 2):
+                encoding = (hash >> i) & 3
+
+                sequence += self.BASE_DECODE_MAP[encoding]
+
+        return sequence
 
     def __setitem__(self, sequence: str, count: int) -> None:
         self.insert(sequence, count)

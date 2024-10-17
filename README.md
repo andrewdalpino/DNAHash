@@ -1,13 +1,11 @@
 # DNA Hash
 
-A specialized datastructure and tokenization library for counting short DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - a two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store counts for sequences that have only been seen once.
+A specialized datastructure and tokenization library for counting DNA sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - an efficient two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store singletons and makes it suitable for use on streaming data.
 
 - **Variable** sequence lengths
 - **Ultra-low** memory footprint
 - **Embarrassingly** parallelizable
 - **Open-source** and free to use commercially
-
-> **Note:** The maximum sequence length is platform dependent. On a 64-bit machine, the max length is 31. On a 32-bit machine, the max length is 15.
 
 > **Note:** Due to the probabilistic nature of the Bloom filter, DNA Hash may over count sequences at a bounded rate.
 
@@ -43,10 +41,8 @@ print(f'Total sequences: {hash_table.num_sequences}')
 print(f'# of unique sequences: {hash_table.num_unique_sequences}')
 print(f'# of singletons: {hash_table.num_singletons}')
 
-counts, bins = hash_table.histogram(20)
-
-plt.stairs(counts, bins)
-plt.title('Histogram of SARS-CoV-2 Genome')
+plt.hist(list(hash_table.counts.values()), bins=20)
+plt.title('SARS-CoV-2 Genome')
 plt.xlabel('Counts')
 plt.ylabel('Frequency')
 plt.show()
