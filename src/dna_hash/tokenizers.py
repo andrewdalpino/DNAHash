@@ -1,7 +1,7 @@
 import re
 
 from abc import ABC, abstractmethod
-from typing import Generator
+from typing import Iterator
 
 INVALID_BASE_REGEX = r'[^ACTG]'
 
@@ -9,7 +9,7 @@ class Tokenizer(ABC):
     """Base tokenizer class"""
 
     @abstractmethod
-    def tokenize(self, sequence: str) -> Generator[str, None, None]:
+    def tokenize(self, sequence: str) -> Iterator[str]:
         pass
 
 class Kmer(Tokenizer):
@@ -24,7 +24,7 @@ class Kmer(Tokenizer):
         self.invalid_base = re.compile(INVALID_BASE_REGEX)
         self.dropped = 0
 
-    def tokenize(self, sequence: str) -> Generator[str, None, None]:
+    def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
         i = 0
 
@@ -81,7 +81,7 @@ class Canonical(Tokenizer):
     def __init__(self, base: Tokenizer) -> None:
         self.base = base
 
-    def tokenize(self, sequence: str) -> Generator[str, None, None]:
+    def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
         tokens = self.base.tokenize(sequence)
 
@@ -100,7 +100,7 @@ class Fragment(Tokenizer):
         self.invalid_base = re.compile(INVALID_BASE_REGEX)
         self.dropped = 0
 
-    def tokenize(self, sequence: str) -> Generator[str, None, None]:
+    def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
         m = len(sequence)
 

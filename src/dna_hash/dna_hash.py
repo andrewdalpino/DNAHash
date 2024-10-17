@@ -115,7 +115,7 @@ class DNAHash(object):
 
         return 1
 
-    def top(self, k: int = 10) -> Iterator:
+    def top(self, k: int = 10) -> Iterator[Tuple[str, int]]:
         """ Return the k sequences with the highest counts."""
         counts = sorted(self.counts.items(), key=lambda item: item[1], reverse=True)
 
