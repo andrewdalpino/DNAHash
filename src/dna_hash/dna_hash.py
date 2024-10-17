@@ -8,7 +8,7 @@ import okbloomer
 from dna_hash.tokenizers import Fragment
 
 class DNAHash(object):
-    """A specialized datastructure for counting DNA sequences for use in Bioinformatics."""
+    """A specialized datastructure for counting genetic sequences for use in Bioinformatics."""
 
     UP_BIT = 1
 
@@ -129,11 +129,9 @@ class DNAHash(object):
         hashes = []
 
         for fragment in self.tokenizer.tokenize(sequence):
-            n = len(fragment)
-
             hash = self.UP_BIT
 
-            for i in range(n - 1, -1, -1):
+            for i in range(len(fragment) - 1, -1, -1):
                 base = fragment[i]
 
                 hash <<= 2
@@ -165,5 +163,5 @@ class DNAHash(object):
         return self.get(sequence)
         
     def __len__(self) -> int:
-        return self.num_sequences
+        return self.num_unique_sequences
         

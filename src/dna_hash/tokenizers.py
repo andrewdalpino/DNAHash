@@ -14,7 +14,7 @@ class Tokenizer(ABC):
 
 class Kmer(Tokenizer):
     """Generates tokens of length k from reads."""
-
+    
     def __init__(self, k: int, skip_invalid: bool = False) -> None:
         if k < 1:
             raise ValueError(f'K cannot be less than 1, {k} given.')
