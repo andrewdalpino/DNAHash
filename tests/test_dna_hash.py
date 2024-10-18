@@ -52,7 +52,7 @@ class TestDNAHash(TestCase):
         self.assertEqual(top[1], ('AAAA', 9))
         self.assertEqual(top[2], ('GCGC', 4))
 
-    def test_advanced(self):
+    def test_large_dataset(self):
         random.seed(1)
 
         hash_table = DNAHash()
@@ -66,4 +66,22 @@ class TestDNAHash(TestCase):
 
         self.assertEqual(hash_table.max(), 9)
         self.assertEqual(hash_table.argmax(), 'AGACTAAA')
+
+    def test_long_sequences(self):
+        random.seed(1)
+
+        hash_table = DNAHash()
+
+        sequence = self.random_read(500)
+
+        hash_table.insert(sequence, 420)
+
+        self.assertEqual(hash_table.num_sequences, 420)
+        self.assertEqual(hash_table.num_singletons, 0)
+        self.assertEqual(hash_table.num_unique_sequences, 1)
+
+        argmax = hash_table.argmax()
+
+        self.assertEqual(argmax, sequence)
+        self.assertEqual(len(argmax), 500)
         
