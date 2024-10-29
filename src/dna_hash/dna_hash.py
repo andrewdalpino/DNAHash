@@ -35,7 +35,7 @@ class DNAHash(object):
         layer_size: int = 32000000,
     ) -> None:
 
-        self.filter = okbloomer.BloomFilter(
+        self._filter = okbloomer.BloomFilter(
             max_false_positive_rate=max_false_positive_rate,
             num_hashes=num_hashes,
             layer_size=layer_size,
@@ -57,7 +57,7 @@ class DNAHash(object):
     @property
     def num_unique_sequences(self) -> int:
         """Return the number of unique sequences stored in the hash table."""
-        return len(self.counts) + self.num_singletons
+        return len(self._counts) + self._num_singletons
 
     @property
     def num_singletons(self) -> int:
@@ -66,25 +66,25 @@ class DNAHash(object):
     @property
     def num_non_singletons(self) -> int:
         """Return the total number of non-singleton sequences counted so far."""
-        return sum(self.counts.values())
+        return sum(self._counts.values())
 
     def insert(self, sequence: str, count: int) -> None:
         """Insert a sequence count into the hash table."""
         if count < 1:
             raise ValueError(f"Count cannot be less than 1, {count} given.")
 
-        exists = self.filter.exists_or_insert(sequence)
+        exists = self._filter.exists_or_insert(sequence)
 
         if count > 1:
             hashes = self._encode(sequence)
 
             if exists and hashes not in self.counts:
-                self.num_singletons -= 1
+                self._num_singletons -= 1
 
-            self.counts[hashes] = count
+            self._counts[hashes] = count
 
         elif not exists:
-            self.num_singletons += 1
+            self._num_singletons += 1
 
     def increment(self, sequence: str) -> None:
         """Increment the count for a given sequence by 1."""
@@ -93,24 +93,24 @@ class DNAHash(object):
         if exists:
             hashes = self._encode(sequence)
 
-            if hashes in self.counts:
-                self.counts[hashes] += 1
+            if hashes in self._counts:
+                self._counts[hashes] += 1
 
             else:
-                self.num_singletons -= 1
+                self._num_singletons -= 1
 
-                self.counts[hashes] = 2
+                self._counts[hashes] = 2
 
         else:
-            self.num_singletons += 1
+            self._num_singletons += 1
 
     def max(self) -> int:
         """Return the highest sequence count."""
-        return max(self.counts.values())
+        return max(self._counts.values())
 
     def argmax(self) -> str:
         """Return the sequence with the highest count."""
-        hashes, count = max(self.counts.items(), key=lambda item: item[1])
+        hashes, count = max(self._counts.items(), key=lambda item: item[1])
 
         return self._decode(hashes)
 
@@ -123,14 +123,14 @@ class DNAHash(object):
 
         hashes = self._encode(sequence)
 
-        if hashes in self.counts:
-            return self.counts[hashes]
+        if hashes in self._counts:
+            return self._counts[hashes]
 
         return 1
 
     def top(self, k: int = 10) -> Iterator[Tuple[str, int]]:
         """Return the k sequences with the highest counts."""
-        counts = sorted(self.counts.items(), key=lambda item: item[1], reverse=True)
+        counts = sorted(self._counts.items(), key=lambda item: item[1], reverse=True)
 
         for hashes, count in counts[0:k]:
             sequence = self._decode(hashes)
@@ -141,7 +141,7 @@ class DNAHash(object):
         """Encode a variable-length sequence using the up2bit representation."""
         hashes = []
 
-        for fragment in self.tokenizer.tokenize(sequence):
+        for fragment in self._tokenizer.tokenize(sequence):
             hash = self.UP_BIT
 
             for i in range(len(fragment) - 1, -1, -1):

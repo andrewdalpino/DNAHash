@@ -1,6 +1,6 @@
 # DNA Hash
 
-A specialized datastructure and tokenization library for counting genetic sequences for use in Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - an efficient two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store singletons and makes it suitable for use on streaming data.
+A specialized datastructure and tokenization library for counting genetic sequences for use in Machine Learning and Bioinformatics. DNA Hash stores k-mer sequence counts by their up2bit encoding - an efficient two-way hash that works with variable-length sequences. As such, DNA Hash uses considerably less memory than a lookup table that stores sequences in plaintext. In addition, DNA Hash's novel autoscaling Bloom filter eliminates the need to explicitly store singletons and makes it suitable for use on streaming data.
 
 - **Ultra-low** memory footprint
 - **Variable** sequence lengths
