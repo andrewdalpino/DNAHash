@@ -88,7 +88,7 @@ class DNAHash(object):
 
     def increment(self, sequence: str) -> None:
         """Increment the count for a given sequence by 1."""
-        exists = self.filter.exists_or_insert(sequence)
+        exists = self._filter.exists_or_insert(sequence)
 
         if exists:
             hashes = self._encode(sequence)
@@ -116,7 +116,7 @@ class DNAHash(object):
 
     def get(self, sequence: str) -> int:
         """Return the count for a sequence."""
-        exists = self.filter.exists(sequence)
+        exists = self._filter.exists(sequence)
 
         if not exists:
             raise ValueError("Sequence not found in hash table.")
