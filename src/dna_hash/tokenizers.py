@@ -21,22 +21,27 @@ class Kmer(Tokenizer):
         if k < 1:
             raise ValueError(f"K cannot be less than 1, {k} given.")
 
-        self.k = k
-        self.skip_invalid = skip_invalid
-        self.invalid_base = re.compile(INVALID_BASE_REGEX)
-        self.dropped = 0
+        self._k = k
+        self._skip_invalid = skip_invalid
+        self._invalid_base = re.compile(INVALID_BASE_REGEX)
+        self._dropped = 0
+
+    @property
+    def dropped(self) -> int:
+        """Return the number of dropped tokens."""
+        return self._dropped
 
     def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
         i = 0
 
-        while i < len(sequence) - self.k:
-            token = sequence[i : i + self.k]
+        while i < len(sequence) - self._k:
+            token = sequence[i : i + self._k]
 
-            invalid_token = self.invalid_base.search(token)
+            invalid_token = self._invalid_base.search(token)
 
             if invalid_token:
-                if not self.skip_invalid:
+                if not self._skip_invalid:
                     offset = i + invalid_token.start()
 
                     raise ValueError(
@@ -48,7 +53,7 @@ class Kmer(Tokenizer):
 
                     i += skip
 
-                    self.dropped += skip
+                    self._dropped += skip
 
                     continue
 
@@ -83,11 +88,11 @@ class Canonical(Tokenizer):
         return complement
 
     def __init__(self, base: Tokenizer) -> None:
-        self.base = base
+        self._base = base
 
     def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
-        tokens = self.base.tokenize(sequence)
+        tokens = self._base.tokenize(sequence)
 
         for token in tokens:
             yield min(token, self.reverse_complement(token))
@@ -100,27 +105,32 @@ class Fragment(Tokenizer):
         if n < 1:
             raise ValueError(f"N must be greater than 1, {n} given.")
 
-        self.n = n
-        self.skip_invalid = skip_invalid
-        self.invalid_base = re.compile(INVALID_BASE_REGEX)
-        self.dropped = 0
+        self._n = n
+        self._skip_invalid = skip_invalid
+        self._invalid_base = re.compile(INVALID_BASE_REGEX)
+        self._dropped = 0
+
+    @property
+    def dropped(self) -> int:
+        """Return the number of dropped tokens."""
+        return self._dropped
 
     def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
         m = len(sequence)
 
-        if m < self.n:
+        if m < self._n:
             yield sequence
 
             return
 
-        for i in range(0, m, self.n):
-            token = sequence[i : i + self.n]
+        for i in range(0, m, self._n):
+            token = sequence[i : i + self._n]
 
-            invalid_token = self.invalid_base.search(token)
+            invalid_token = self._invalid_base.search(token)
 
             if invalid_token:
-                if not self.skip_invalid:
+                if not self._skip_invalid:
                     offset = i + invalid_token.start()
 
                     raise ValueError(
@@ -128,7 +138,7 @@ class Fragment(Tokenizer):
                     )
 
                 else:
-                    self.dropped += 1
+                    self._dropped += 1
 
                     continue
 

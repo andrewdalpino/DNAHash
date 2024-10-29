@@ -1,7 +1,7 @@
 import math
 import sys
 
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple, Dict
 
 import okbloomer
 
@@ -41,9 +41,13 @@ class DNAHash(object):
             layer_size=layer_size,
         )
 
-        self.counts: dict[Tuple[int, ...], int] = {}
-        self.num_singletons = 0
-        self.tokenizer = Fragment(self.MAX_FRAGMENT_LENGTH)
+        self._counts: dict[Tuple[int, ...], int] = {}
+        self._num_singletons = 0
+        self._tokenizer = Fragment(self.MAX_FRAGMENT_LENGTH)
+
+    @property
+    def counts(self) -> Dict[Tuple[int, ...], int]:
+        return self._counts
 
     @property
     def num_sequences(self) -> int:
@@ -54,6 +58,10 @@ class DNAHash(object):
     def num_unique_sequences(self) -> int:
         """Return the number of unique sequences stored in the hash table."""
         return len(self.counts) + self.num_singletons
+
+    @property
+    def num_singletons(self) -> int:
+        return self._num_singletons
 
     @property
     def num_non_singletons(self) -> int:
