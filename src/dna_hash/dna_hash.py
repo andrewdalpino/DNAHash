@@ -7,28 +7,33 @@ import okbloomer
 
 from dna_hash.tokenizers import Fragment
 
+
 class DNAHash(object):
     """A specialized datastructure for counting genetic sequences for use in Bioinformatics."""
 
     UP_BIT = 1
 
     BASE_ENCODE_MAP = {
-        'A': 0,
-        'C': 1,
-        'T': 2,
-        'G': 3,
+        "A": 0,
+        "C": 1,
+        "T": 2,
+        "G": 3,
     }
 
     BITS_PER_BASE = max(BASE_ENCODE_MAP.values()).bit_length()
 
-    MAX_FRAGMENT_LENGTH = math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - UP_BIT.bit_length()
+    MAX_FRAGMENT_LENGTH = (
+        math.ceil(math.log(sys.maxsize, 2) / BITS_PER_BASE) - UP_BIT.bit_length()
+    )
 
     BASE_DECODE_MAP = {encoding: base for base, encoding in BASE_ENCODE_MAP.items()}
 
-    def __init__(self,
-                max_false_positive_rate: float = 0.01,
-                num_hashes: int = 4,
-                layer_size: int = 32000000) -> None:
+    def __init__(
+        self,
+        max_false_positive_rate: float = 0.01,
+        num_hashes: int = 4,
+        layer_size: int = 32000000,
+    ) -> None:
 
         self.filter = okbloomer.BloomFilter(
             max_false_positive_rate=max_false_positive_rate,
@@ -58,7 +63,7 @@ class DNAHash(object):
     def insert(self, sequence: str, count: int) -> None:
         """Insert a sequence count into the hash table."""
         if count < 1:
-            raise ValueError(f'Count cannot be less than 1, {count} given.')
+            raise ValueError(f"Count cannot be less than 1, {count} given.")
 
         exists = self.filter.exists_or_insert(sequence)
 
@@ -69,7 +74,7 @@ class DNAHash(object):
                 self.num_singletons -= 1
 
             self.counts[hashes] = count
-        
+
         elif not exists:
             self.num_singletons += 1
 
@@ -82,7 +87,7 @@ class DNAHash(object):
 
             if hashes in self.counts:
                 self.counts[hashes] += 1
-            
+
             else:
                 self.num_singletons -= 1
 
@@ -101,12 +106,12 @@ class DNAHash(object):
 
         return self._decode(hashes)
 
-    def get(self, sequence: str) ->int:
+    def get(self, sequence: str) -> int:
         """Return the count for a sequence."""
         exists = self.filter.exists(sequence)
-        
+
         if not exists:
-            raise ValueError('Sequence not found in hash table.')
+            raise ValueError("Sequence not found in hash table.")
 
         hashes = self._encode(sequence)
 
@@ -116,7 +121,7 @@ class DNAHash(object):
         return 1
 
     def top(self, k: int = 10) -> Iterator[Tuple[str, int]]:
-        """ Return the k sequences with the highest counts."""
+        """Return the k sequences with the highest counts."""
         counts = sorted(self.counts.items(), key=lambda item: item[1], reverse=True)
 
         for hashes, count in counts[0:k]:
@@ -143,8 +148,8 @@ class DNAHash(object):
 
     def _decode(self, hashes: Tuple[int, ...]) -> str:
         """Decode an up2bit representation into a variable-length sequence."""
-        sequence = ''
-        
+        sequence = ""
+
         for hash in hashes:
             if hash == self.UP_BIT:
                 continue
@@ -161,7 +166,6 @@ class DNAHash(object):
 
     def __getitem__(self, sequence: str) -> int:
         return self.get(sequence)
-        
+
     def __len__(self) -> int:
         return self.num_unique_sequences
-        

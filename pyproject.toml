@@ -17,8 +17,8 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.optional-dependencies]
-dev = ["mypy", "biopython", "matplotlib"]
-test = ["mypy"]
+dev = ["mypy", "black", "biopython", "matplotlib"]
+test = ["mypy", "black"]
 
 [project.urls]
 Homepage = "https://github.com/andrewdalpino/DNAHash"

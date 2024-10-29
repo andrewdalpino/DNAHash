@@ -13,6 +13,7 @@ jobs:
         os: [ubuntu-latest]
         python:
           - "3.10"
+          - "3.13"
 
     runs-on: ${{ matrix.os }}
 
@@ -30,3 +31,6 @@ jobs:
 
       - name: Run tests
         run: python -m unittest
+
+      - name: Coding style
+        run: python -m black --check ./
