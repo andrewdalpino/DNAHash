@@ -85,3 +85,110 @@ class TestDNAHash(TestCase):
 
         self.assertEqual(argmax, sequence)
         self.assertEqual(len(argmax), 500)
+
+        def test_encode_decode(self):
+            """Test the encode and decode functionality."""
+            sequences = ["A", "C", "G", "T", "ACTG", "GATTACA", "AAAAAA", "GGGCCC"]
+
+            for seq in sequences:
+                encoded = DNAHash.encode(seq)
+                decoded = DNAHash.decode(encoded)
+                self.assertEqual(seq, decoded)
+
+    def test_get_method(self):
+        """Test the get method for sequence retrieval."""
+        hash_table = DNAHash()
+
+        # Test get on empty hash
+        self.assertEqual(hash_table.get("ACGT"), 0)
+
+        # Test get on singleton
+        hash_table.increment("ACGT")
+        self.assertEqual(hash_table.get("ACGT"), 1)
+
+        # Test get on non-singleton
+        hash_table.increment("ACGT")
+        self.assertEqual(hash_table.get("ACGT"), 2)
+
+        # Test get on another sequence with direct insertion
+        hash_table.insert("GGGG", 5)
+        self.assertEqual(hash_table.get("GGGG"), 5)
+
+        # Test get on non-existent sequence
+        self.assertEqual(hash_table.get("TTTT"), 0)
+
+    def test_insert_method(self):
+        """Test the insert method with various counts."""
+        hash_table = DNAHash()
+
+        # Insert with count 1
+        hash_table.insert("ACGT", 1)
+        self.assertEqual(hash_table.num_singletons, 1)
+        self.assertEqual(hash_table.num_sequences, 1)
+
+        # Insert with count > 1
+        hash_table.insert("GGGG", 3)
+        self.assertEqual(hash_table.num_singletons, 1)
+        self.assertEqual(hash_table.num_non_singletons, 3)
+        self.assertEqual(hash_table.num_sequences, 4)
+
+        # Update existing singleton to non-singleton
+        hash_table.insert("ACGT", 5)
+        self.assertEqual(hash_table.num_singletons, 0)
+        self.assertEqual(hash_table.num_non_singletons, 8)
+        self.assertEqual(hash_table.num_sequences, 8)
+
+        # Update existing non-singleton
+        hash_table.insert("GGGG", 10)
+        self.assertEqual(hash_table.num_non_singletons, 15)
+        self.assertEqual(hash_table.num_sequences, 15)
+
+    def test_invalid_inputs(self):
+        """Test error handling for invalid inputs."""
+        hash_table = DNAHash()
+
+        # Test insert with count < 1
+        with self.assertRaises(ValueError):
+            hash_table.insert("ACGT", 0)
+
+        with self.assertRaises(ValueError):
+            hash_table.insert("ACGT", -1)
+
+        with self.assertRaises(ValueError):
+            hash_table.encode("ACGTN")
+
+    def test_dictionary_interface(self):
+        """Test the dictionary-like behavior."""
+        hash_table = DNAHash()
+
+        # Test __setitem__
+        hash_table["ACGT"] = 3
+        self.assertEqual(hash_table.get("ACGT"), 3)
+
+        # Test __getitem__
+        self.assertEqual(hash_table["ACGT"], 3)
+        self.assertEqual(hash_table["TTTT"], 0)  # Non-existent sequence
+
+        # Test __len__
+        self.assertEqual(len(hash_table), 1)
+
+        hash_table["GGGG"] = 1
+        self.assertEqual(len(hash_table), 2)
+
+        hash_table.increment("AAAA")
+        self.assertEqual(len(hash_table), 3)
+
+    def test_empty_sequence_handling(self):
+        """Test handling of empty sequences."""
+        hash_table = DNAHash()
+
+        # Test encode/decode with empty sequence
+        encoded = DNAHash.encode("")
+        self.assertEqual(DNAHash.decode(encoded), "")
+
+        # Test insert and get with empty sequence
+        hash_table.insert("", 1)
+        self.assertEqual(hash_table.get(""), 1)
+
+        hash_table.increment("")
+        self.assertEqual(hash_table.get(""), 2)
