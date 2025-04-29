@@ -24,18 +24,13 @@ class Kmer(Tokenizer):
         self._k = k
         self._skip_invalid = skip_invalid
         self._invalid_base = re.compile(INVALID_BASE_REGEX)
-        self._dropped = 0
-
-    @property
-    def dropped(self) -> int:
-        """Return the number of dropped tokens."""
-        return self._dropped
 
     def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
+
         i = 0
 
-        while i < len(sequence) - self._k:
+        while i <= len(sequence) - self._k:
             token = sequence[i : i + self._k]
 
             invalid_token = self._invalid_base.search(token)
@@ -45,15 +40,10 @@ class Kmer(Tokenizer):
                     offset = i + invalid_token.start()
 
                     raise ValueError(
-                        "Invalid base detected at" + f" offset {offset} in sequence."
+                        f"Invalid base detected at offset {offset} in sequence."
                     )
-
                 else:
-                    skip = 1 + invalid_token.start()
-
-                    i += skip
-
-                    self._dropped += skip
+                    i += 1 + invalid_token.start()
 
                     continue
 
@@ -75,11 +65,10 @@ class Canonical(Tokenizer):
     @classmethod
     def reverse_complement(cls, sequence: str) -> str:
         """Return the reverse complement of a sequence."""
+
         complement = ""
 
-        for i in range(len(sequence) - 1, -1, -1):
-            base = sequence[i]
-
+        for base in reversed(sequence):
             if base not in cls.BASE_COMPLIMENT_MAP:
                 raise ValueError("Invalid base {base} given.")
 
@@ -92,6 +81,7 @@ class Canonical(Tokenizer):
 
     def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
+
         tokens = self._base.tokenize(sequence)
 
         for token in tokens:
@@ -108,15 +98,10 @@ class Fragment(Tokenizer):
         self._n = n
         self._skip_invalid = skip_invalid
         self._invalid_base = re.compile(INVALID_BASE_REGEX)
-        self._dropped = 0
-
-    @property
-    def dropped(self) -> int:
-        """Return the number of dropped tokens."""
-        return self._dropped
 
     def tokenize(self, sequence: str) -> Iterator[str]:
         """Tokenize the sequence."""
+
         m = len(sequence)
 
         if m < self._n:
@@ -134,12 +119,9 @@ class Fragment(Tokenizer):
                     offset = i + invalid_token.start()
 
                     raise ValueError(
-                        "Invalid base detected at" + f" offset {offset} in sequence."
+                        f"Invalid base detected at offset {offset} in sequence."
                     )
-
                 else:
-                    self._dropped += 1
-
                     continue
 
             yield token
